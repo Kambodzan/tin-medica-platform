@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 require('dotenv').config()
 
@@ -37,19 +38,24 @@ app.use(express.json());
 const SECRET_KEY = process.env.SECRET_KEY;
 
 app.post('/register', async (req, res) => {
-  const { email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
+  console.log(hashedPassword);
+  const id = uuidv4();
 
-  db.query('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword], (err) => {
-    if (err) return res.status(500).send('Error registering user');
-    res.status(201).send('User registered');
+  db.query('INSERT INTO Users (id, name, surname, email, password) VALUES (?, ?, ?, ?, ?)', [id, firstName, lastName, email, hashedPassword], (err) => {
+      if (err) {
+        console.log(err); 
+        return res.status(500).send('Error registering user');
+      }
+      res.status(201).send('User registered');
   });
 });
 
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
 
-  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
+  db.query('SELECT * FROM Users WHERE email = ?', [email], async (err, results) => {
     if (err || results.length === 0) return res.status(401).send('Invalid credentials');
 
     const user = results[0];
@@ -57,7 +63,16 @@ app.post('/login', (req, res) => {
     if (!isValid) return res.status(401).send('Invalid credentials');
 
     const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
-    res.json({ token });
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.name,
+        lastName: user.surname,
+        profilePicture: user.profilePicture,
+      },
+    });
   });
 });
 
