@@ -1,21 +1,26 @@
 import React from 'react';
 
-const DashboardCalendarTile = ({ id, date, onClick }) => {
-  const dayOfWeek = date.toLocaleDateString('en-GB', { weekday: 'long' });
-  const dayDetails = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-
+const DashboardCalendarTile = ({ date, isHighlighted, visitDetails, onClick }) => {
   return (
     <div
-      className="bg-white rounded-sm border-[0.5px] cursor-pointer hover:bg-gray-100 transition-colors duration-300"
-      onClick={onClick} // Wywołanie funkcji onClick z identyfikatorem
+      className={`p-2 border rounded cursor-pointer ${
+        isHighlighted ? 'bg-blue-100 border-blue-500' : 'bg-gray-50 border-gray-200'
+      }`}
+      onClick={onClick}
     >
-      <div className="bg-blue-500 text-white text-center py-2">
-        <h3 className="text-base font-bold">{dayOfWeek}</h3>
+      <div className="text-sm font-bold">
+        {date.toLocaleDateString('en-GB', { weekday: 'short' })}
       </div>
-      <div className="p-8 text-center">
-        <p className="text-sm font-medium">{dayDetails}</p>
-        <p className="text-xs">Click to edit</p>
+      <div className="text-xs">
+        {date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
       </div>
+      {visitDetails && (
+        <div className="mt-2 text-xs text-gray-700">
+          <p>{visitDetails.consultationType}</p>
+          <p>{visitDetails.doctorName}</p>
+          <p>{visitDetails.clinicName}</p>
+        </div>
+      )}
     </div>
   );
 };

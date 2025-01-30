@@ -1,12 +1,56 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import DashboardCalendarTile from '../components/DashboardCalendarTile';
-import LastVisitCard from '../components/LastVisitCard'; // Import komponentu
-import TestTable from '../components/TestTable'; // Import TestTable
+import LastVisitCard from '../components/LastVisitCard';
+import TestTable from '../components/TestTable';
 import ReferralTiles from '../components/ReferralTiles';
+import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard = () => {
+  const { user } = useAuth(); // Pobieramy dane użytkownika
+  const [data, setData] = useState(null); // Ustawienie początkowego stanu na null
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/dashboard/${user.id}`);
+        const result = await response.json();
+        setData(result); // Zapisanie pełnej odpowiedzi w stanie
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [user.id]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen">
+        <Sidebar activeIndex={0} />
+        <div className="flex-grow flex flex-col items-center justify-center">
+          <p>Loading Dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Dodajemy bezpieczne sprawdzenie, czy dane istnieją
+  if (!data) {
+    return (
+      <div className="flex h-screen">
+        <Sidebar activeIndex={0} />
+        <div className="flex-grow flex flex-col items-center justify-center">
+          <p>Error: Unable to load dashboard data.</p>
+        </div>
+      </div>
+    );
+  }
+
   const today = new Date();
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
@@ -15,7 +59,13 @@ const Dashboard = () => {
   });
 
   const handleTileClick = (date) => {
-    alert(`Edit events for: ${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}`);
+    alert(
+      `Edit events for: ${date.toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'short',
+      })}`
+    );
   };
 
   const handleDetailsClick = (visit) => {
@@ -37,120 +87,110 @@ const Dashboard = () => {
           {/* Header */}
           <div className="flex-shrink-0 mb-4">
             <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
-            <p className="text-gray-600">This is the main content of the page.</p>
           </div>
 
           {/* Main Grid */}
           <div
             className="flex-grow grid grid-cols-3 grid-rows-3 gap-4 pb-8"
             style={{
-              gridTemplateRows: 'repeat(3, 50%)', // Równomierny podział wysokości
-              gridTemplateColumns: 'repeat(3, 1fr)', // Równomierny podział szerokości
+              gridTemplateRows: 'repeat(3, 50%)',
+              gridTemplateColumns: 'repeat(3, 1fr)',
             }}
           >
             {/* Schedule Section */}
             <div className="col-span-2 bg-white p-4 flex flex-col justify-between">
               <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold">Schedule for the week</h2>
-                  <a href="#" className="text-blue-500 text-sm font-medium">Show more</a>
-                </div>
+                <h2 className="text-2xl font-bold">Schedule for the week</h2>
+                <a href="#" className="text-blue-500 text-sm font-medium">
+                  Show more
+                </a>
+              </div>
               <div className="grid grid-cols-7 gap-2 flex-grow">
-                {days.map((date) => (
-                  <DashboardCalendarTile
-                    key={date.toISOString()}
-                    date={date}
-                    onClick={() => handleTileClick(date)}
-                  />
-                ))}
+                {days.map((date) => {
+                  const matchingVisit = data.visitDates?.find(
+                    (visit) => new Date(visit.visit_date).toDateString() === date.toDateString()
+                  );
+                  return (
+                    <DashboardCalendarTile
+                      key={date.toISOString()}
+                      date={date}
+                      isHighlighted={!!matchingVisit}
+                      visitDetails={
+                        matchingVisit
+                          ? {
+                              consultationType: matchingVisit.consultation_type,
+                              doctorName: matchingVisit.doctor_name,
+                              clinicName: matchingVisit.clinic_name,
+                            }
+                          : null
+                      }
+                      onClick={() => handleTileClick(date)}
+                    />
+                  );
+                })}
               </div>
             </div>
 
             {/* Last Visits Section */}
             <div className="bg-white p-4 flex flex-col h-full">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-2xl font-bold">Last Visits</h2>
-                  <a href="#" className="text-blue-500 text-sm font-medium">Show more</a>
-                </div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">Last Visits</h2>
+                <a href="#" className="text-blue-500 text-sm font-medium">
+                  Show more
+                </a>
+              </div>
               <div className="flex-grow flex flex-col justify-between space-y-2">
-                <LastVisitCard
-                  title="Cardiologist"
-                  date="20 stycznia 2025"
-                  time="14:00"
-                  name="Jan Kowalski"
-                  address="ul. Przykladowa 123, Warszawa"
-                  onDetailsClick={() => handleDetailsClick("Wizyta 1")}
-                />
-                <LastVisitCard
-                  title="Orthopedic Surgeon"
-                  date="21 stycznia 2025"
-                  time="16:00"
-                  name="Anna Nowak"
-                  address="ul. Przykładna 456, Kraków"
-                  onDetailsClick={() => handleDetailsClick("Wizyta 2")}
-                />
-                <LastVisitCard
-                  title="Family Doctor"
-                  date="22 stycznia 2025"
-                  time="10:00"
-                  name="Piotr Zieliński"
-                  address="ul. Przykładkowa 789, Gdańsk"
-                  onDetailsClick={() => handleDetailsClick("Wizyta 3")}
-                />
+                {data.lastVisits &&
+                  data.lastVisits.map((visit, index) => (
+                    <LastVisitCard
+                      key={index}
+                      title={visit.speciality}
+                      date={new Date(visit.consultation_date).toLocaleDateString()}
+                      time={new Date(visit.consultation_date).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                      name={visit.doctor_name}
+                      address={`${visit.clinic_name}, ${visit.clinic_address}`}
+                      onDetailsClick={() => handleDetailsClick(`Visit ${index + 1}`)}
+                    />
+                  ))}
               </div>
             </div>
 
-            {/* Single Yellow Section */}
+            {/* Tests Section */}
             <div className="bg-white flex items-center justify-center h-full">
-              {/* <h3 className="text-xl font-bold mb-4">Tests</h3> */}
-              <TestTable type="TEST" />
+              <TestTable tests={data.tests} type="TEST" />
             </div>
 
+            {/* Referrals Section */}
             <div className="bg-white flex items-center justify-center h-full">
               <div className="w-full h-full p-4">
-                {/* Nagłówek w lewym górnym rogu */}
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-2xl font-bold">Referrals</h2>
-                  <a href="#" className="text-blue-500 text-sm font-medium">Show more</a>
+                  <a href="#" className="text-blue-500 text-sm font-medium">
+                    Show more
+                  </a>
                 </div>
-
-                {/* Siatka z kafelkami */}
                 <div className="grid grid-cols-2 gap-4 h-[calc(100%-2rem)] pb-4">
-                      <ReferralTiles 
-                      title="Referrals 1"
-                      doctor="Dr. Kowalski"
-                      issueDate="2025-01-20"
-                      urgent="Yes"
+                  {data.referrals &&
+                    data.referrals.map((referral, index) => (
+                      <ReferralTiles
+                        key={index}
+                        title={referral.reason}
+                        doctor={referral.referred_to}
+                        issueDate={new Date(referral.issue_date).toLocaleDateString()}
+                        urgent={referral.urgent ? 'Yes' : 'No'}
                       />
-                      <ReferralTiles 
-                        title="Referrals 2"
-                        doctor="Dr. Zieliński"
-                        issueDate="2025-01-19"
-                        urgent="No"
-                      />
-                      <ReferralTiles 
-                        title="Referrals 3"
-                        doctor="Dr. Lewandowski"
-                        issueDate="2025-01-18"
-                        urgent="No"
-                      />
-                      <ReferralTiles 
-                        title="Referrals 4"
-                        doctor="Dr. Kamińska"
-                        issueDate="2025-01-17"
-                        urgent="Yes"
-                      />
+                    ))}
                 </div>
               </div>
             </div>
 
+            {/* Prescriptions Section */}
             <div className="bg-white flex items-center justify-center h-full">
-              <TestTable tye="PRESCRIPTION" />
+              <TestTable prescriptions={data.prescriptions} type="PRESCRIPTION" />
             </div>
-
-            {/* Merged Green Section */}
-            {/* <div className="col-span-2 bg-green-300 flex items-center justify-center">
-              Merged Green
-            </div> */}
           </div>
         </div>
       </div>

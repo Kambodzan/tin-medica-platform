@@ -16,15 +16,6 @@ const Navbar = () => {
       
       {/* Sekcja języka, imienia i profilowego zdjęcia */}
       <div className="flex items-center space-x-4">
-        {/* Dropdown wyboru języka */}
-        <div className="relative">
-          <select
-            className="bg-white border border-gray-300 rounded-md px-3 py-2 text-base focus:outline-none"
-          >
-            <option value="en">🇬🇧 English</option>
-            <option value="pl">🇵🇱 Polski</option>
-          </select>
-        </div>
         
         {/* Imię i nazwisko */}
         {user ? (

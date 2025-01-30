@@ -1,7 +1,7 @@
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
 
-  console.log('ProtectedRoute user:', user); // Loguj użytkownika
+  console.log('ProtectedRoute user:', user);
 
   if (!user) {
     console.log('User not logged in. Redirecting to /login.');

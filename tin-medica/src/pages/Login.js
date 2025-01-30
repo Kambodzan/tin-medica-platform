@@ -29,7 +29,6 @@ const LoginForm = () => {
       const response = await axios.post('http://localhost:5000/login', { email, password });
   
       if (response.data.token) {
-        // Przekazanie tokena i danych użytkownika do AuthContext
         login({
           token: response.data.token,
           ...response.data.user, // Rozpakowanie danych użytkownika
@@ -49,7 +48,7 @@ const LoginForm = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Sign In</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Login</h2>
 
         {errorMessage && (
           <div className="w-full mt-2 text-sm text-center text-red-500">{errorMessage}</div>
@@ -90,14 +89,14 @@ const LoginForm = () => {
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors"
           >
-            Sign In
+            Log In
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
           Don't have an account?{' '}
           <a href="/register" className="text-blue-600 hover:text-blue-500 font-medium">
-            Sign up
+            Register
           </a>
         </div>
       </div>

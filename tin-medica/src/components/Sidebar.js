@@ -15,11 +15,10 @@ const Sidebar = ({ activeIndex }) => {
   const menuItems = [
     { label: 'Dashboard', href: '/dashboard', icon: 'fa-regular fa-chart-tree-map' },
     { label: 'Appointments', href: '/appointments', icon: 'fa-regular fa-calendar' },
-    { label: 'Referrals', href: '/refferals', icon: 'fa-regular fa-paper-plane-top' },
+    { label: 'Referrals', href: '/referrals', icon: 'fa-regular fa-paper-plane-top' },
     { label: 'Tests', href: '/tests', icon: 'fa-regular fa-microscope' },
     { label: 'History', href: '/history', icon: 'fa-regular fa-clock-rotate-left' },
     { label: 'Prescriptions', href: '/prescriptions', icon: 'fa-regular fa-tablets' },
-    { label: 'DoctorsPanel', href: '/clients', icon: 'fas fa-user-md' },
     { label: 'Profile', href: '/profile', icon: 'fa-regular fa-circle-user' },
   ];
 

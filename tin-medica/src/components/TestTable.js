@@ -145,7 +145,7 @@ const TestTable = ({ type }) => {
               onClick={() => paginate(number)}
               className={`px-3 py-1 min-w-9 min-h-9 text-sm font-normal ${
                 currentPage === number
-                  ? "text-white bg-slate-800 border border-slate-800 rounded hover:bg-slate-600 hover:border-slate-600"
+                  ? "text-white bg-blue-500 border border-blue-500 rounded hover:bg-slate-600 hover:border-slate-600"
                   : "text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-50 hover:border-slate-400"
               } transition duration-200 ease`}
             >

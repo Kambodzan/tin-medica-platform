@@ -6,6 +6,12 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Homepage from './pages/Homepage';
 import Profile from './pages/Profile';
+import Prescriptions from './pages/Prescriptions';
+import Referrals from './pages/Referrals';
+import Tests from './pages/Tests';
+import HistoryPage from './pages/HistoryPage';
+import Appointments from './pages/Appointments';
+import DoctorsPanel from './pages/DoctorsPanel';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -28,11 +34,51 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+                    <Route
+            path="/prescriptions"
+            element={
+              <ProtectedRoute>
+                <Prescriptions />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/profile"
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tests"
+            element={
+              <ProtectedRoute>
+                <Tests />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <ProtectedRoute>
+                <HistoryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/referrals"
+            element={
+              <ProtectedRoute>
+                <Referrals />
+              </ProtectedRoute>
+            }
+          />
+                    <Route
+            path="/appointments"
+            element={
+              <ProtectedRoute>
+                <Appointments />
               </ProtectedRoute>
             }
           />
